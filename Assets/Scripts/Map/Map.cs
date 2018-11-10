@@ -11,14 +11,15 @@ public class Map : MonoBehaviour {
     void Start()
     {
         string contents = File.ReadAllText(@"C:\Users\Henry\Desktop\Descent\Assets\Maps\Map01.json");
+        DeserializeMap(contents);
     }
 
     private void DeserializeMap(string json)
     {
         MapJSON map = JsonConvert.DeserializeObject<MapJSON>(json);
 
-        int x = map.mapRows[0].row.Split(',').Length;
-        int y = map.mapRows.Length;
+        int x = map.mapRows.Length;
+        int y = map.mapRows[0].row.Split(',').Length;
         TileValues = new int[x, y];
 
         for(int i = 0; i < x; i++)
@@ -28,6 +29,12 @@ public class Map : MonoBehaviour {
             {
                 int value;
                 TileValues[i, j] = (int.TryParse(rowValues[j], out value) ? value : 0);
+
+                if (TileValues[i, j] != 0)
+                {
+                    var mapPrefab = TileStatus.GetMapPrefabById(TileValues[i, j]);
+                    Instantiate(mapPrefab, new Vector3(i * 1f, 0, j * 1f), Quaternion.identity);
+                }
             }
         }
     }
